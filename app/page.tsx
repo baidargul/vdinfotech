@@ -153,17 +153,34 @@ export default function Home() {
       </section>
 
       <section className="section testimonial-section">
-        <div className="shell testimonial-grid">
-          <div className="quote-card">
+        <div className="shell testimonial-row">
+          <div className="testimonial-card">
+            <span className="testimonial-avatar">MA</span>
+            <div><p className="quote-stars">★★★★★</p><p><strong>Maria Ahmed</strong><br />Product Director, Northstar</p></div>
             <span className="quote-mark">“</span>
-            <blockquote>VD Infotech didn&apos;t just build what we asked for. They challenged the brief, simplified the experience, and delivered a platform our customers genuinely love.</blockquote>
-            <div className="quote-author"><span>MA</span><p><strong>Maria Ahmed</strong><br />Product Director, Northstar</p></div>
           </div>
-          <div className="impact-grid">
-            <article className="impact impact-dark"><Icon name="spark" /><strong>120+</strong><span>products and platforms delivered</span></article>
-            <article className="impact"><span className="mini-label">Partnership</span><strong>94%</strong><span>of clients choose to work with us again</span></article>
-            <article className="impact impact-accent"><span className="mini-label">Impact</span><strong>32%</strong><span>average improvement in key product metrics</span></article>
-            <article className="impact impact-wide"><span>React</span><span>TypeScript</span><span>Cloud</span><span>AI</span><p>Modern tools. Proven foundations.</p></article>
+          <div className="testimonial-copy">
+            <p className="eyebrow"><span /> Client perspective</p>
+            <blockquote>“VD Infotech challenged the brief, simplified the experience, and delivered a platform our customers genuinely love.”</blockquote>
+            <p>They worked like an extension of our own team—clear, thoughtful, and focused on outcomes from the very first workshop.</p>
+            <div className="testimonial-arrows"><button aria-label="Previous testimonial">←</button><button aria-label="Next testimonial">→</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section metrics-section">
+        <div className="shell">
+          <div className="section-heading centered metrics-heading">
+            <p className="eyebrow"><span /> Measurable momentum</p>
+            <h2>Built to create value you can <em>see.</em></h2>
+          </div>
+          <div className="metrics-mosaic">
+            <article className="metric-tile metric-visual-a"><span className="visual-ring" /></article>
+            <article className="metric-tile metric-copy-tile"><Icon name="spark" /><strong>120+</strong><span>products and platforms delivered</span></article>
+            <article className="metric-tile metric-visual-b"><span className="visual-stack" /></article>
+            <article className="metric-tile metric-small"><span className="mini-label">Partnership</span><strong>94%</strong><span>of clients work with us again</span></article>
+            <article className="metric-tile metric-accent"><span className="mini-label">Impact</span><strong>32%</strong><span>average lift in key product metrics</span></article>
+            <article className="metric-tile metric-wide"><span>React</span><span>TypeScript</span><span>Cloud</span><span>AI</span><p>Modern tools. Proven foundations.</p></article>
           </div>
         </div>
       </section>
@@ -171,18 +188,19 @@ export default function Home() {
       <section className="section process-section" id="process">
         <div className="shell process-grid">
           <div className="process-copy">
-            <p className="eyebrow"><span /> A better way to build</p>
-            <h2>Clear thinking. Close collaboration. <em>No surprises.</em></h2>
-            <p>Our process keeps everyone aligned, makes progress visible, and puts real user value at the center of every sprint.</p>
+            <p className="eyebrow"><span /> Why VD Infotech</p>
+            <h2>A delivery partner built around <em>your momentum.</em></h2>
+            <p>From first idea to continuous improvement, our process keeps everyone aligned and puts real user value at the center of every sprint.</p>
             <ul>
-              {["Senior specialists on every engagement", "Weekly demos and transparent progress", "Flexible scope without losing momentum", "Quality, security, and accessibility built in"].map((item) => <li key={item}><span><Icon name="check" /></span>{item}</li>)}
+              {["Senior specialists on every engagement", "Weekly demos and transparent progress", "Flexible scope without losing momentum", "Quality, security, and accessibility built in", "Post-launch support when you need it"].map((item) => <li key={item}><span><Icon name="check" /></span>{item}</li>)}
             </ul>
             <a className="button button-dark" href="#contact">Build with us <Icon name="arrow" /></a>
           </div>
-          <div className="process-steps">
-            {[['01','Discover','We align on the problem, users, and measures of success.'],['02','Design','We turn insight into clear journeys and a tested interface.'],['03','Build','We ship in focused iterations with progress you can see.'],['04','Grow','We measure, learn, and improve after launch.']].map(([num,title,text]) => (
-              <article key={num}><span>{num}</span><div><h3>{title}</h3><p>{text}</p></div></article>
-            ))}
+          <div className="process-visual" aria-label="VD Infotech product delivery dashboard illustration">
+            <div className="process-browser"><i /><i /><i /><strong>VD / Product delivery</strong></div>
+            <div className="process-sidebar"><span /><span /><span /><span /></div>
+            <div className="process-board"><div><small>Discovery</small><b>Complete</b></div><div><small>Design system</small><b>In review</b></div><div><small>Development</small><b>On track</b></div></div>
+            <div className="process-progress"><span /><em>78% ready for launch</em></div>
           </div>
         </div>
       </section>
