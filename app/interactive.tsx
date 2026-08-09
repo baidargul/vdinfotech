@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useRef, useState } from "react";
+import Link from "next/link";
 
 function ArrowIcon() {
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
@@ -12,12 +13,13 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="shell nav-wrap">
-        <a className="brand" href="#home" aria-label="VD Infotech home" onClick={close}><span className="brand-mark">VD</span><span><strong>VD INFOTECH</strong><small>Ideas. Engineered.</small></span></a>
+        <Link className="brand" href="/" aria-label="VD Infotech home" onClick={close}><span className="brand-mark">VD</span><span><strong>VD INFOTECH</strong><small>Ideas. Engineered.</small></span></Link>
         <nav className={open ? "nav-links is-open" : "nav-links"} aria-label="Primary navigation">
-          <a href="#about" onClick={close}>About</a><a href="#services" onClick={close}>Services</a><a href="#work" onClick={close}>Work</a><a href="#process" onClick={close}>Process</a>
-          <a className="nav-mobile-cta" href="#contact" onClick={close}>Let&apos;s talk <ArrowIcon /></a>
+          <Link href="/#about" onClick={close}>About</Link><Link href="/#services" onClick={close}>Services</Link><Link href="/#work" onClick={close}>Work</Link><Link href="/#process" onClick={close}>Process</Link><Link href="/blog" onClick={close}>Blog</Link>
+          <Link className="nav-mobile-login" href="/login" onClick={close}>Login</Link>
+          <Link className="nav-mobile-cta" href="/#contact" onClick={close}>Let&apos;s talk <ArrowIcon /></Link>
         </nav>
-        <div className="nav-actions"><a className="social-link" href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">in</a><a className="nav-cta" href="#contact">Let&apos;s talk <ArrowIcon /></a></div>
+        <div className="nav-actions"><a className="social-link" href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn">in</a><Link className="nav-login" href="/login">Login</Link><Link className="nav-cta" href="/#contact">Let&apos;s talk <ArrowIcon /></Link></div>
         <button className={open ? "menu-button is-open" : "menu-button"} type="button" onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open}><span /><span /></button>
       </div>
     </header>

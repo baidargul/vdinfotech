@@ -20,6 +20,26 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Authentication setup
+
+The login, signup, and dashboard routes require MongoDB and a session secret. Copy
+`.env.example` to `.env.local`, then update these values:
+
+```bash
+MONGODB_URI=mongodb://127.0.0.1:27017/vdinfotech
+SESSION_SECRET=replace-with-a-random-secret-containing-at-least-32-characters
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+For production, use your hosted MongoDB connection string and generate a unique,
+high-entropy session secret. Never commit `.env.local`.
+
+Blog images and downloadable files are stored in `storage/blog` by default. Set
+`BLOG_UPLOAD_DIR` to an absolute path on a persistent writable disk in production.
+Local file storage is not suitable for ephemeral or serverless deployments without
+a mounted volume. Downloads accept PDF, DOCX, XLSX, PPTX, TXT, CSV, and ZIP files
+up to 20 MB.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

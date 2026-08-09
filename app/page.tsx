@@ -1,10 +1,14 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
   ContactForm,
   FaqList,
   SiteHeader,
   ServiceRail,
 } from "./interactive";
+import { LatestPosts } from "./latest-posts";
+
+export const dynamic = "force-dynamic";
 
 type IconName =
   | "code"
@@ -221,6 +225,8 @@ export default function Home() {
         </div>
       </section>
 
+      <LatestPosts />
+
       <section className="closing-cta">
         <div className="cta-lines" aria-hidden="true" />
         <div className="shell cta-content"><p className="eyebrow light"><span /> Your next chapter</p><h2>Let&apos;s build something<br /><em>worth remembering.</em></h2><a className="button button-mint" href="#contact">Start a conversation <Icon name="arrow" /></a></div>
@@ -229,7 +235,7 @@ export default function Home() {
       <footer className="footer">
         <div className="shell footer-grid">
           <div className="footer-brand"><a className="brand" href="#home" aria-label="VD Infotech home"><span className="brand-mark">VD</span><span><strong>VD INFOTECH</strong><small>Ideas. Engineered.</small></span></a><p>We design and build digital products that make businesses more useful, resilient, and ready for what&apos;s next.</p></div>
-          <div className="footer-links"><h3>Explore</h3><a href="#about">About</a><a href="#services">Services</a><a href="#work">Work</a><a href="#process">Process</a></div>
+          <div className="footer-links"><h3>Explore</h3><a href="#about">About</a><a href="#services">Services</a><a href="#work">Work</a><a href="#process">Process</a><Link href="/blog">Blog</Link></div>
           <div className="footer-links"><h3>Services</h3><a href="#services">Web development</a><a href="#services">Mobile apps</a><a href="#services">UI/UX design</a><a href="#services">Cloud solutions</a></div>
           <div className="footer-contact"><h3>Get in touch</h3><a href="mailto:hello@vdinfotech.com"><Icon name="mail" /> hello@vdinfotech.com</a><a href="tel:+923001234567"><Icon name="phone" /> +92 300 123 4567</a><p><Icon name="pin" /> Lahore, Pakistan</p></div>
         </div>
