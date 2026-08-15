@@ -8,6 +8,7 @@ import { LogoutButton } from "./logout-button";
 
 const navigation = [
   { href: "/dashboard", label: "Overview", icon: "grid" },
+  { href: "/dashboard/hero", label: "Hero", icon: "hero" },
   { href: "/dashboard/posts", label: "Posts", icon: "posts" },
   { href: "/dashboard/posts/trash", label: "Trash", icon: "trash" },
   { href: "/dashboard/profile", label: "Profile", icon: "profile" },
@@ -16,6 +17,7 @@ const navigation = [
 function NavIcon({ name }: { name: string }) {
   const paths: Record<string, React.ReactNode> = {
     grid: <><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></>,
+    hero: <><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 15 3-3 2 2 2.5-3 3.5 4M8 8h.01"/></>,
     posts: <><path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></>,
     trash: <><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/><path d="M10 11v6M14 11v6"/></>,
     profile: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,

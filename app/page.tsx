@@ -7,6 +7,8 @@ import {
   ServiceRail,
 } from "./interactive";
 import { LatestPosts } from "./latest-posts";
+import { HeroCarousel } from "./hero-carousel";
+import { getHeroSettings } from "@/lib/hero-data";
 
 export const dynamic = "force-dynamic";
 
@@ -63,40 +65,12 @@ const faqs = [
   { question: "Do you provide support after launch?", answer: "Yes. We offer flexible maintenance and growth plans covering monitoring, updates, performance, new features, and ongoing product improvement." },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const heroSettings = await getHeroSettings();
   return (
     <main>
       <SiteHeader />
-
-      <section className="hero" id="home">
-        <div className="hero-content shell">
-          <div className="hero-copy">
-            <p className="eyebrow light"><span /> Digital products, built with purpose</p>
-            <h1>We turn bold ideas into <em>remarkable</em> software.</h1>
-            <p className="hero-lead">VD Infotech designs and engineers digital experiences that help modern businesses launch faster, work smarter, and grow with confidence.</p>
-            <div className="hero-actions">
-              <a className="button button-mint" href="#contact">Start a project <Icon name="arrow" /></a>
-              <a className="text-link light-link" href="#work">Explore our work <Icon name="arrow" /></a>
-            </div>
-            <div className="hero-proof">
-              <div className="avatar-stack" aria-hidden="true"><span>AK</span><span>SM</span><span>JR</span></div>
-              <p><strong>4.9/5</strong><br />Trusted by product teams worldwide</p>
-            </div>
-          </div>
-
-          <div className="hero-visual" aria-label="Abstract representation of connected digital products">
-            <div className="hero-grid" />
-            <div className="code-window">
-              <div className="window-dots"><i /><i /><i /></div>
-              <div className="code-lines"><i /><i /><i /><i /><i /></div>
-            </div>
-            <div className="orbit orbit-one"><span>UI</span></div>
-            <div className="orbit orbit-two"><span>API</span></div>
-            <div className="orbit orbit-three"><span>01</span></div>
-            <div className="floating-note"><Icon name="spark" /><span>Built to scale<br /><strong>from day one.</strong></span></div>
-          </div>
-        </div>
-      </section>
+      <HeroCarousel settings={heroSettings} />
 
       <section className="trust-strip" aria-label="Technology expertise">
         <div className="shell trust-row">

@@ -36,6 +36,7 @@ yarn-error.log*
 
 # local blog media
 /storage/blog/
+/storage/hero-templates/
 
 # vercel
 .vercel

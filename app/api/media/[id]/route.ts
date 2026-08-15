@@ -4,6 +4,8 @@ import { connectToDatabase } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { removeImage } from "@/lib/media-storage";
 import { Media } from "@/models/media";
+import { HeroSettings } from "@/models/hero-settings";
+import { referencedTemplateMediaIds } from "@/lib/hero-template-storage";
 
 export async function DELETE(request: Request, context: RouteContext<"/api/media/[id]">) {
   const origin = request.headers.get("origin");
@@ -31,6 +33,14 @@ export async function DELETE(request: Request, context: RouteContext<"/api/media
   if (!media) return NextResponse.json({ error: "Media not found." }, { status: 404 });
   if (media.post) {
     return NextResponse.json({ error: "Attached media must be removed from the post first." }, { status: 409 });
+  }
+  const usedByHero = await HeroSettings.exists({ "slides.image": media._id });
+  if (usedByHero) {
+    return NextResponse.json({ error: "This image is attached to a hero slide. Save the carousel after removing it first." }, { status: 409 });
+  }
+  const templateMediaIds = await referencedTemplateMediaIds();
+  if (templateMediaIds.has(media._id.toString())) {
+    return NextResponse.json({ error: "This image is attached to a saved hero template." }, { status: 409 });
   }
 
   await removeImage(media.storedName);

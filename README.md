@@ -40,6 +40,11 @@ Local file storage is not suitable for ephemeral or serverless deployments witho
 a mounted volume. Downloads accept PDF, DOCX, XLSX, PPTX, TXT, CSV, and ZIP files
 up to 20 MB.
 
+Shared hero templates are stored as JSON files in `storage/hero-templates` by
+default. Set `HERO_TEMPLATE_DIR` to an absolute path on the same kind of persistent
+writable volume in production. Template writes use lock files and atomic renames;
+all application instances must share this directory.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
