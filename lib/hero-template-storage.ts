@@ -1,10 +1,10 @@
 import "server-only";
 
 import { randomUUID } from "crypto";
-import { mkdir, open, readFile, readdir, rename, rm, stat, unlink, writeFile } from "fs/promises";
-import path from "path";
 import { z } from "zod";
+import { connectToDatabase } from "@/lib/db";
 import { heroSettingsSchema } from "@/lib/hero-validation";
+import { HeroTemplate } from "@/models/hero-template";
 import type { HeroSettingsData, HeroTemplateActor, HeroTemplateFile } from "@/lib/hero-types";
 
 const actorSchema = z.object({ id: z.string().min(1), name: z.string().min(1).max(80), email: z.string().email() });
@@ -19,42 +19,13 @@ const templateSchema = z.object({
   carousel: heroSettingsSchema, activity: z.array(activitySchema).max(2000),
 });
 
-function storageDirectory() {
-  return path.resolve(/*turbopackIgnore: true*/ process.env.HERO_TEMPLATE_DIR || path.join(process.cwd(), "storage", "hero-templates"));
-}
-
 function assertId(id: string) {
   if (!z.string().uuid().safeParse(id).success) throw new Error("Template not found.");
   return id;
 }
 
-function templatePath(id: string) { return path.join(storageDirectory(), `${assertId(id)}.json`); }
-function lockPath(id: string) { return path.join(storageDirectory(), `${assertId(id)}.lock`); }
-
-async function atomicWrite(template: HeroTemplateFile) {
-  await mkdir(storageDirectory(), { recursive: true });
-  const target = templatePath(template.id);
-  const temporary = path.join(storageDirectory(), `.${template.id}.${randomUUID()}.tmp`);
-  await writeFile(temporary, `${JSON.stringify(template, null, 2)}\n`, { encoding: "utf8", flag: "wx" });
-  await rename(temporary, target);
-}
-
-async function withLock<T>(id: string, operation: () => Promise<T>): Promise<T> {
-  await mkdir(storageDirectory(), { recursive: true });
-  const target = lockPath(id);
-  let handle: Awaited<ReturnType<typeof open>> | null = null;
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    try { handle = await open(target, "wx"); break; }
-    catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-      const info = await stat(target).catch(() => null);
-      if (info && Date.now() - info.mtimeMs > 30_000) await unlink(target).catch(() => undefined);
-      await new Promise((resolve) => setTimeout(resolve, 50 + attempt * 10));
-    }
-  }
-  if (!handle) throw new Error("Template is busy. Please try again.");
-  try { return await operation(); }
-  finally { await handle.close(); await unlink(target).catch(() => undefined); }
+function parseTemplate(value: unknown): HeroTemplateFile {
+  return templateSchema.parse(value);
 }
 
 export function templateActor(user: { id: string; name: string; email: string }): HeroTemplateActor {
@@ -66,52 +37,50 @@ export function canonicalCarousel(settings: HeroSettingsData): HeroSettingsData 
 }
 
 export async function readHeroTemplate(id: string): Promise<HeroTemplateFile> {
-  let source: string;
-  try { source = await readFile(templatePath(id), "utf8"); }
-  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") throw new Error("Template not found."); throw error; }
-  return templateSchema.parse(JSON.parse(source));
+  await connectToDatabase();
+  const template = await HeroTemplate.findOne({ id: assertId(id) }).select("-_id").lean().exec();
+  if (!template) throw new Error("Template not found.");
+  return parseTemplate(template);
 }
 
 export async function listHeroTemplates(): Promise<HeroTemplateFile[]> {
-  await mkdir(storageDirectory(), { recursive: true });
-  const names = (await readdir(storageDirectory())).filter((name) => /^[0-9a-f-]{36}\.json$/i.test(name));
-  const results = await Promise.all(names.map(async (name) => {
-    try { return await readHeroTemplate(name.slice(0, -5)); } catch { return null; }
-  }));
-  return results.filter((item): item is HeroTemplateFile => Boolean(item)).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  await connectToDatabase();
+  const templates = await HeroTemplate.find({}).select("-_id").sort({ updatedAt: -1 }).lean().exec();
+  return templates.map(parseTemplate);
 }
 
 export async function createHeroTemplate(input: { name: string; description: string; carousel: HeroSettingsData; user: HeroTemplateActor }) {
   const id = randomUUID(); const now = new Date().toISOString();
-  return withLock(id, async () => {
-    const template = templateSchema.parse({ schemaVersion: 1, id, revision: 1, name: input.name, description: input.description, createdBy: input.user, createdAt: now, updatedBy: input.user, updatedAt: now, lastAppliedBy: null, lastAppliedAt: null, carousel: canonicalCarousel(input.carousel), activity: [{ id: randomUUID(), action: "created", revision: 1, user: input.user, at: now }] });
-    await atomicWrite(template); return template;
-  });
+  const template = parseTemplate({ schemaVersion: 1, id, revision: 1, name: input.name, description: input.description, createdBy: input.user, createdAt: now, updatedBy: input.user, updatedAt: now, lastAppliedBy: null, lastAppliedAt: null, carousel: canonicalCarousel(input.carousel), activity: [{ id: randomUUID(), action: "created", revision: 1, user: input.user, at: now }] });
+  await connectToDatabase();
+  await HeroTemplate.create(template);
+  return template;
 }
 
 export async function updateHeroTemplate(id: string, expectedRevision: number, input: { name: string; description: string; carousel: HeroSettingsData; user: HeroTemplateActor }) {
-  return withLock(id, async () => {
-    const current = await readHeroTemplate(id);
-    if (current.revision !== expectedRevision) throw new Error("This template was edited by someone else. Reload before saving again.");
-    const now = new Date().toISOString(); const revision = current.revision + 1;
-    const template = templateSchema.parse({ ...current, revision, name: input.name, description: input.description, updatedBy: input.user, updatedAt: now, carousel: canonicalCarousel(input.carousel), activity: [...current.activity, { id: randomUUID(), action: "edited", revision, user: input.user, at: now }] });
-    await atomicWrite(template); return template;
-  });
+  const current = await readHeroTemplate(id);
+  if (current.revision !== expectedRevision) throw new Error("This template was edited by someone else. Reload before saving again.");
+  const now = new Date().toISOString(); const revision = current.revision + 1;
+  const template = parseTemplate({ ...current, revision, name: input.name, description: input.description, updatedBy: input.user, updatedAt: now, carousel: canonicalCarousel(input.carousel), activity: [...current.activity, { id: randomUUID(), action: "edited", revision, user: input.user, at: now }] });
+  const updated = await HeroTemplate.findOneAndReplace({ id: current.id, revision: expectedRevision }, template, { returnDocument: "after" }).select("-_id").lean().exec();
+  if (!updated) throw new Error("This template was edited by someone else. Reload before saving again.");
+  return parseTemplate(updated);
 }
 
 export async function applyHeroTemplate(id: string, expectedRevision: number, user: HeroTemplateActor, apply: (template: HeroTemplateFile) => Promise<void>) {
-  return withLock(id, async () => {
-    const current = await readHeroTemplate(id);
-    if (current.revision !== expectedRevision) throw new Error("This template changed. Reload it before applying.");
-    await apply(current);
-    const now = new Date().toISOString();
-    const template = templateSchema.parse({ ...current, lastAppliedBy: user, lastAppliedAt: now, activity: [...current.activity, { id: randomUUID(), action: "applied", revision: current.revision, user, at: now }] });
-    await atomicWrite(template); return template;
-  });
+  const current = await readHeroTemplate(id);
+  if (current.revision !== expectedRevision) throw new Error("This template changed. Reload it before applying.");
+  await apply(current);
+  const now = new Date().toISOString();
+  const template = parseTemplate({ ...current, lastAppliedBy: user, lastAppliedAt: now, activity: [...current.activity, { id: randomUUID(), action: "applied", revision: current.revision, user, at: now }] });
+  const updated = await HeroTemplate.findOneAndReplace({ id: current.id, revision: expectedRevision }, template, { returnDocument: "after" }).select("-_id").lean().exec();
+  if (!updated) throw new Error("This template changed. Reload it before applying.");
+  return parseTemplate(updated);
 }
 
 export async function deleteHeroTemplate(id: string) {
-  return withLock(id, async () => { await rm(templatePath(id), { force: true }); });
+  await connectToDatabase();
+  await HeroTemplate.deleteOne({ id: assertId(id) }).exec();
 }
 
 export async function referencedTemplateMediaIds(excludeTemplateId?: string) {
