@@ -150,7 +150,6 @@ export default async function Home() {
             </article>
             <article className="metric-tile metric-visual-b metric-visual-image"><Image src="/metrics/product-performance-dashboard.png" alt="Product performance dashboard showing activation, retention, conversion, and experiments" fill sizes="(max-width: 480px) calc(100vw - 32px), (max-width: 760px) 48vw, 360px" /></article>
             <article className="metric-tile metric-small"><span className="mini-label">Partnership</span><strong>94%</strong><span>of clients work with us again</span></article>
-            <article className="metric-tile metric-accent"><span className="mini-label">Impact</span><strong>32%</strong><span>average lift in key product metrics</span></article>
             <article className="metric-tile metric-wide"><span>React</span><span>TypeScript</span><span>Cloud</span><span>AI</span><p>Modern tools. Proven foundations.</p></article>
           </div>
         </div>
