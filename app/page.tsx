@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FaAws } from "react-icons/fa6";
+import { SiFlutter, SiMongodb, SiNextdotjs, SiNodedotjs, SiPython, SiReact, SiTypescript } from "react-icons/si";
 import {
   ContactForm,
   FaqList,
@@ -55,6 +57,17 @@ const services = [
   { icon: "team" as const, number: "05", title: "Dedicated Teams", text: "A focused, senior delivery team that fits your process and helps you move from idea to impact.", image: "/services/dedicated-teams.png", imageAlt: "Experienced delivery team reviewing a shared product roadmap" },
 ];
 
+const technologies = [
+  { Icon: SiReact, name: "React", purpose: "Interfaces", color: "#149eca" },
+  { Icon: SiNextdotjs, name: "Next.js", purpose: "Web platforms", color: "#111111" },
+  { Icon: SiNodedotjs, name: "Node.js", purpose: "Back-end systems", color: "#44883e" },
+  { Icon: SiPython, name: "Python", purpose: "AI & automation", color: "#3776ab" },
+  { Icon: FaAws, name: "AWS", purpose: "Cloud infrastructure", color: "#e77700" },
+  { Icon: SiFlutter, name: "Flutter", purpose: "Mobile products", color: "#02569b" },
+  { Icon: SiTypescript, name: "TypeScript", purpose: "Reliable code", color: "#3178c6" },
+  { Icon: SiMongodb, name: "MongoDB", purpose: "Flexible data", color: "#3f8e3d" },
+];
+
 const projects = [
   { type: "Fintech platform", title: "Orbit Finance", result: "2.4× faster onboarding", image: "/projects/orbit-finance-dashboard.png", imageAlt: "Orbit Finance cash operations dashboard" },
   { type: "Health technology", title: "CareSync", result: "60% fewer admin tasks", image: "/projects/caresync-dashboard.png", imageAlt: "CareSync clinic scheduling and patient operations dashboard" },
@@ -78,8 +91,12 @@ export default async function Home() {
 
       <section className="trust-strip" aria-label="Technology expertise">
         <div className="shell trust-row">
-          <p>Technologies we trust</p>
-          <div className="tech-list"><span>React</span><span>Next.js</span><span>Node.js</span><span>Python</span><span>AWS</span><span>Flutter</span></div>
+          <div className="trust-intro"><span aria-hidden="true" /><div><p>Engineering stack</p><strong>Technologies we trust</strong></div></div>
+          <div className="tech-marquee">
+            <div className="tech-track">
+              {[false, true].map((duplicate) => <div className="tech-set" aria-hidden={duplicate || undefined} key={String(duplicate)}>{technologies.map(({ Icon: TechIcon, name, purpose, color }) => <span className="tech-item" key={name}><i className="tech-mark" style={{ color }} aria-hidden="true"><TechIcon /></i><span><strong>{name}</strong><small>{purpose}</small></span></span>)}</div>)}
+            </div>
+          </div>
         </div>
       </section>
 
