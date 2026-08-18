@@ -47,11 +47,11 @@ function Icon({ name, className = "" }: { name: IconName; className?: string }) 
 }
 
 const services = [
-  { icon: "code" as const, number: "01", title: "Web Development", text: "Fast, scalable web platforms designed around real business goals and seamless customer journeys." },
-  { icon: "mobile" as const, number: "02", title: "Mobile Apps", text: "Intuitive iOS and Android products that feel native, perform reliably, and keep users coming back." },
-  { icon: "ai" as const, number: "03", title: "AI Integrations", text: "Practical AI solutions that automate workflows, connect your data, and help your team make faster decisions." },
-  { icon: "cloud" as const, number: "04", title: "Cloud Solutions", text: "Secure infrastructure and smart integrations built to scale with your team and your customers." },
-  { icon: "team" as const, number: "05", title: "Dedicated Teams", text: "A focused, senior delivery team that fits your process and helps you move from idea to impact." },
+  { icon: "code" as const, number: "01", title: "Web Development", text: "Fast, scalable web platforms designed around real business goals and seamless customer journeys.", image: "/services/web-development.png", imageAlt: "Real web engineering workspace with interface layouts and code" },
+  { icon: "mobile" as const, number: "02", title: "Mobile Apps", text: "Intuitive iOS and Android products that feel native, perform reliably, and keep users coming back.", image: "/services/mobile-apps.png", imageAlt: "Mobile product prototypes and interaction sketches on a workbench" },
+  { icon: "ai" as const, number: "03", title: "AI Integrations", text: "Practical AI solutions that automate workflows, connect your data, and help your team make faster decisions.", image: "/services/ai-integrations.png", imageAlt: "Applied AI workstation with data pipeline and evaluation dashboard" },
+  { icon: "cloud" as const, number: "04", title: "Cloud Solutions", text: "Secure infrastructure and smart integrations built to scale with your team and your customers.", image: "/services/cloud-solutions.png", imageAlt: "Private cloud infrastructure with server racks and structured cabling" },
+  { icon: "team" as const, number: "05", title: "Dedicated Teams", text: "A focused, senior delivery team that fits your process and helps you move from idea to impact.", image: "/services/dedicated-teams.png", imageAlt: "Experienced delivery team reviewing a shared product roadmap" },
 ];
 
 const projects = [

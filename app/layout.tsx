@@ -4,6 +4,7 @@ import { getContactWidgetSettings } from "@/lib/contact-widget-settings";
 import { getWhatsAppSettings } from "@/lib/whatsapp-settings";
 import { WhatsAppButton } from "./whatsapp-button";
 import { LeadWidget } from "./lead-widget";
+import { ImageProtection } from "./image-protection";
 import "./globals.css";
 
 const sans = DM_Sans({ variable: "--font-sans", subsets: ["latin"] });
@@ -24,5 +25,5 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const [contactWidgetSettings, whatsappSettings] = await Promise.all([getContactWidgetSettings(), getWhatsAppSettings()]);
-  return <html lang="en" className={`${sans.variable} ${display.variable}`}><body>{children}<LeadWidget settings={contactWidgetSettings} /><WhatsAppButton settings={whatsappSettings} /></body></html>;
+  return <html lang="en" className={`${sans.variable} ${display.variable}`}><body>{children}<ImageProtection /><LeadWidget settings={contactWidgetSettings} /><WhatsAppButton settings={whatsappSettings} /></body></html>;
 }

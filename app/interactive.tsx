@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { createLeadAction, type LeadActionState } from "@/app/actions/leads";
 import { saveVisitorProfile, useVisitorProfile } from "./visitor-profile";
 
@@ -28,7 +29,7 @@ export function SiteHeader() {
   );
 }
 
-type Service = { icon: "code" | "mobile" | "ai" | "cloud" | "team"; number: string; title: string; text: string };
+type Service = { icon: "code" | "mobile" | "ai" | "cloud" | "team"; number: string; title: string; text: string; image: string; imageAlt: string };
 function ServiceIcon({ name }: { name: Service["icon"] }) {
   const iconPaths = {
     code: <><path d="m8.5 9-3 3 3 3M15.5 9l3 3-3 3M13 6l-2 12" /></>,
@@ -42,8 +43,12 @@ function ServiceIcon({ name }: { name: Service["icon"] }) {
 
 export function ServiceRail({ services }: { services: Service[] }) {
   const rail = useRef<HTMLDivElement>(null);
+  const [activeService, setActiveService] = useState<number | null>(null);
   const scroll = (direction: number) => rail.current?.scrollBy({ left: direction * 300, behavior: "smooth" });
-  return <div className="rail-area"><div className="service-rail" ref={rail}>{services.map((service) => <article className="service-card" key={service.title}><span className="service-number">{service.number}</span><div className="service-icon"><ServiceIcon name={service.icon} /></div><h3>{service.title}</h3><p>{service.text}</p><a href="#contact" aria-label={`Discuss ${service.title}`}>Learn more <ArrowIcon /></a></article>)}</div><div className="rail-controls"><button type="button" aria-label="Previous services" onClick={() => scroll(-1)}>←</button><button type="button" aria-label="Next services" onClick={() => scroll(1)}>→</button></div></div>;
+  return <>
+    <div className="service-section-backgrounds" aria-hidden="true">{services.map((service, index) => <Image className={activeService === index ? "is-active" : ""} src={service.image} alt="" fill sizes="(max-width: 760px) 100vw, 1180px" key={service.image} />)}</div>
+    <div className="rail-area" onMouseLeave={() => setActiveService(null)}><div className="service-rail" ref={rail}>{services.map((service, index) => <article className="service-card" key={service.title} onMouseEnter={() => setActiveService(index)} onFocus={() => setActiveService(index)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setActiveService(null); }}><Image className="service-card-image" src={service.image} alt={service.imageAlt} fill sizes="(max-width: 760px) 82vw, 300px" /><span className="service-number">{service.number}</span><div className="service-icon"><ServiceIcon name={service.icon} /></div><h3>{service.title}</h3><p>{service.text}</p><a href="#contact" aria-label={`Discuss ${service.title}`}>Learn more <ArrowIcon /></a></article>)}</div><div className="rail-controls"><button type="button" aria-label="Previous services" onClick={() => scroll(-1)}>←</button><button type="button" aria-label="Next services" onClick={() => scroll(1)}>→</button></div></div>
+  </>;
 }
 
 export function FaqList({ items }: { items: { question: string; answer: string }[] }) {
