@@ -10,6 +10,7 @@ import {
 import { LatestPosts } from "./latest-posts";
 import { HeroCarousel } from "./hero-carousel";
 import { ReviewsCarousel } from "./reviews-carousel";
+import { ClosingCta } from "./closing-cta";
 import { getHeroSettings } from "@/lib/hero-data";
 import { getReviewSettings } from "@/lib/review-settings";
 
@@ -190,10 +191,7 @@ export default async function Home() {
 
       <LatestPosts />
 
-      <section className="closing-cta">
-        <div className="cta-lines" aria-hidden="true" />
-        <div className="shell cta-content"><p className="eyebrow light"><span /> Your next chapter</p><h2>Let&apos;s build something<br /><em>worth remembering.</em></h2><a className="button button-mint" href="#contact">Start a conversation <Icon name="arrow" /></a></div>
-      </section>
+      <ClosingCta />
 
       <footer className="footer">
         <div className="shell footer-grid">
