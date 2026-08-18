@@ -129,7 +129,19 @@ export default async function Home() {
       </section>
 
       <section className="section work-section" id="work">
-        <div className="shell">
+        <div className="work-backdrops" aria-hidden="true">
+          {projects.map((project) => (
+            <Image
+              className="work-backdrop"
+              src={project.image}
+              alt=""
+              fill
+              sizes="100vw"
+              key={project.title}
+            />
+          ))}
+        </div>
+        <div className="shell work-content">
           <div className="section-heading centered">
             <p className="eyebrow"><span /> Selected work</p>
             <h2>Products that perform in the <em>real world.</em></h2>

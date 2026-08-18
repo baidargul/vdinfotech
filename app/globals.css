@@ -135,9 +135,17 @@ h1 em, h2 em { font-family: var(--font-display), Georgia, serif; font-weight: 50
 .rail-controls button:hover { background: var(--mint); color: var(--ink); }
 
 /* Work */
-.work-section { background: var(--cream); }
+.work-section { position: relative; isolation: isolate; overflow: hidden; background: var(--cream); }
+.work-backdrops { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.work-backdrops::after { position: absolute; inset: 0; z-index: 2; content: ""; background: rgba(244,243,238,.84); }
+.work-backdrop { z-index: 1; object-fit: cover; object-position: center 28%; opacity: 0; transform: scale(1.035); transition: opacity .38s ease; will-change: opacity; }
+.work-content { position: relative; z-index: 2; }
+.work-section:has(.project-card:nth-child(1):hover) .work-backdrop:nth-child(1),
+.work-section:has(.project-card:nth-child(2):hover) .work-backdrop:nth-child(2),
+.work-section:has(.project-card:nth-child(3):hover) .work-backdrop:nth-child(3) { opacity: .46; }
 .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.project-card { position: relative; min-width: 0; overflow: hidden; background: white; border-radius: 10px; box-shadow: 0 8px 25px rgba(16,42,48,.06); }
+.project-card { position: relative; min-width: 0; overflow: hidden; background: rgba(255,255,255,.96); border-radius: 10px; box-shadow: 0 8px 25px rgba(16,42,48,.06); transition: transform .35s ease, box-shadow .35s ease, background .35s ease; }
+.project-card:hover { background: #fff; box-shadow: 0 14px 32px rgba(16,42,48,.11); transform: translateY(-4px); }
 .project-mockup { position: relative; aspect-ratio: 4 / 3; margin: 12px; overflow: hidden; border: 1px solid #e3e8e7; border-radius: 7px; background: #f6f7f6; }
 .project-mockup img { object-fit: cover; object-position: top center; transition: transform .45s ease; }
 .project-card:hover .project-mockup img { transform: scale(1.018); }
