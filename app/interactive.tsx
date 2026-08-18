@@ -2,6 +2,8 @@
 
 import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
+import { createLeadAction, type LeadActionState } from "@/app/actions/leads";
+import { saveVisitorProfile, useVisitorProfile } from "./visitor-profile";
 
 function ArrowIcon() {
   return <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
@@ -26,12 +28,12 @@ export function SiteHeader() {
   );
 }
 
-type Service = { icon: "code" | "mobile" | "design" | "cloud" | "team"; number: string; title: string; text: string };
+type Service = { icon: "code" | "mobile" | "ai" | "cloud" | "team"; number: string; title: string; text: string };
 function ServiceIcon({ name }: { name: Service["icon"] }) {
   const iconPaths = {
     code: <><path d="m8.5 9-3 3 3 3M15.5 9l3 3-3 3M13 6l-2 12" /></>,
     mobile: <><rect width="11" height="18" x="6.5" y="3" rx="2" /><path d="M10 6h4M11 18h2" /></>,
-    design: <><path d="M12 3a9 9 0 1 0 0 18h1.3a2.2 2.2 0 0 0 0-4.4h-1.2a1.8 1.8 0 0 1 0-3.6H15a6 6 0 0 0 0-12Z" /><circle cx="8" cy="9" r=".7" /><circle cx="11" cy="6" r=".7" /></>,
+    ai: <><rect x="7" y="7" width="10" height="10" rx="2" /><path d="M9 3v4M15 3v4M9 17v4M15 17v4M3 9h4M3 15h4M17 9h4M17 15h4" /><path d="m10 13 1.4-3 1.4 3M10.5 12h1.8M14.5 10v3" /></>,
     cloud: <path d="M17.5 19H7a5 5 0 1 1 1.1-9.9A6.5 6.5 0 0 1 20.4 11 4 4 0 0 1 17.5 19Z" />,
     team: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /></>,
   };
@@ -50,8 +52,28 @@ export function FaqList({ items }: { items: { question: string; answer: string }
 }
 
 export function ContactForm() {
+  const profile = useVisitorProfile();
   const [submitted, setSubmitted] = useState(false);
-  const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); if (event.currentTarget.reportValidity()) setSubmitted(true); };
-  if (submitted) return <div className="form-success" role="status"><span>✓</span><h3>Thank you. We&apos;re on it.</h3><p>Your message is ready for our team. In this frontend demo, no data has been sent.</p><button type="button" onClick={() => setSubmitted(false)}>Send another message</button></div>;
-  return <form className="contact-form" onSubmit={submit}><div className="form-row"><label><span>Your name</span><input name="name" type="text" placeholder="Jane Smith" required /></label><label><span>Work email</span><input name="email" type="email" placeholder="jane@company.com" required /></label></div><label><span>What can we help with?</span><select name="service" defaultValue="" required><option value="" disabled>Select a service</option><option>Web development</option><option>Mobile application</option><option>UI/UX design</option><option>Cloud solution</option><option>Dedicated team</option></select></label><label><span>Tell us about your project</span><textarea name="message" placeholder="A quick overview of your goals, timeline, and where you need help…" rows={4} required /></label><button className="button button-mint form-submit" type="submit">Send enquiry <ArrowIcon /></button><small>By submitting, you agree to be contacted about your enquiry.</small></form>;
+  const [pending, setPending] = useState(false);
+  const [state, setState] = useState<LeadActionState>({});
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!form.reportValidity()) return;
+    setPending(true);
+    setState({});
+    const data = new FormData(form);
+    const visitorId = profile.visitorId || crypto.randomUUID();
+    data.set("visitorId", visitorId);
+    data.set("source", "contact-form");
+    data.set("pageUrl", window.location.href);
+    const result = await createLeadAction(data);
+    setPending(false);
+    setState(result);
+    if (!result.success) return;
+    saveVisitorProfile({ visitorId, name: String(data.get("name") ?? ""), email: String(data.get("email") ?? ""), phone: profile.phone, company: profile.company });
+    setSubmitted(true);
+  };
+  if (submitted) return <div className="form-success" role="status"><span>✓</span><h3>Thank you. We&apos;re on it.</h3><p>Your enquiry has reached our team. We&apos;ll get back to you within one business day.</p><button type="button" onClick={() => setSubmitted(false)}>Send another message</button></div>;
+  return <form className="contact-form" key={profile.visitorId || "contact-guest"} onSubmit={submit}><input className="lead-honeypot" name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" /><div className="form-row"><label><span>Your name</span><input name="name" type="text" defaultValue={profile.name} autoComplete="name" placeholder="Jane Smith" required /></label><label><span>Work email</span><input name="email" type="email" defaultValue={profile.email} autoComplete="email" placeholder="jane@company.com" required /></label></div><label><span>What can we help with?</span><select name="service" defaultValue="" required><option value="" disabled>Select a service</option><option>Web development</option><option>Mobile application</option><option>AI integrations</option><option>Cloud solution</option><option>Dedicated team</option></select></label><label><span>Tell us about your project</span><textarea name="message" placeholder="A quick overview of your goals, timeline, and where you need help…" rows={4} required /></label>{state.message && <p className="contact-form-error" role="alert">{state.message}</p>}{state.errors && <p className="contact-form-error" role="alert">{Object.values(state.errors).flat()[0]}</p>}<button className="button button-mint form-submit" type="submit" disabled={pending}>{pending ? "Sending…" : <>Send enquiry <ArrowIcon /></>}</button><small>By submitting, you agree to be contacted about your enquiry.</small></form>;
 }

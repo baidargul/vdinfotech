@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { removeImage } from "@/lib/media-storage";
 import { Media } from "@/models/media";
 import { HeroSettings } from "@/models/hero-settings";
+import { SiteSettings } from "@/models/site-settings";
 import { referencedTemplateMediaIds } from "@/lib/hero-template-storage";
 
 export async function DELETE(request: Request, context: RouteContext<"/api/media/[id]">) {
@@ -37,6 +38,10 @@ export async function DELETE(request: Request, context: RouteContext<"/api/media
   const usedByHero = await HeroSettings.exists({ "slides.image": media._id });
   if (usedByHero) {
     return NextResponse.json({ error: "This image is attached to a hero slide. Save the carousel after removing it first." }, { status: 409 });
+  }
+  const usedByReview = await SiteSettings.exists({ "reviews.items.image": media._id });
+  if (usedByReview) {
+    return NextResponse.json({ error: "This image is attached to a published review. Save the reviews after removing it first." }, { status: 409 });
   }
   const templateMediaIds = await referencedTemplateMediaIds();
   if (templateMediaIds.has(media._id.toString())) {

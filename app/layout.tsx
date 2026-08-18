@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
+import { getContactWidgetSettings } from "@/lib/contact-widget-settings";
+import { getWhatsAppSettings } from "@/lib/whatsapp-settings";
+import { WhatsAppButton } from "./whatsapp-button";
+import { LeadWidget } from "./lead-widget";
 import "./globals.css";
 
 const sans = DM_Sans({ variable: "--font-sans", subsets: ["latin"] });
@@ -18,6 +22,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
-  return <html lang="en" className={`${sans.variable} ${display.variable}`}><body>{children}</body></html>;
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const [contactWidgetSettings, whatsappSettings] = await Promise.all([getContactWidgetSettings(), getWhatsAppSettings()]);
+  return <html lang="en" className={`${sans.variable} ${display.variable}`}><body>{children}<LeadWidget settings={contactWidgetSettings} /><WhatsAppButton settings={whatsappSettings} /></body></html>;
 }
