@@ -1,6 +1,6 @@
 import "server-only";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { jwtVerify, SignJWT } from "jose";
 
 const SESSION_COOKIE = "vd_session";
@@ -15,8 +15,53 @@ function getSessionKey() {
   return new TextEncoder().encode(secret);
 }
 
+function configuredSecureCookieValue() {
+  const value = process.env.SESSION_COOKIE_SECURE?.trim().toLowerCase();
+  if (!value || value === "auto") return null;
+  if (value === "true") return true;
+  if (value === "false") return false;
+
+  throw new Error('SESSION_COOKIE_SECURE must be "auto", "true", or "false".');
+}
+
+function protocolFromUrl(value: string | null) {
+  if (!value) return null;
+
+  try {
+    return new URL(value).protocol;
+  } catch {
+    return null;
+  }
+}
+
+async function shouldUseSecureCookie() {
+  const configured = configuredSecureCookieValue();
+  if (configured !== null) return configured;
+
+  const requestHeaders = await headers();
+  const requestProtocol =
+    protocolFromUrl(requestHeaders.get("origin")) ??
+    protocolFromUrl(requestHeaders.get("referer"));
+  if (requestProtocol) return requestProtocol === "https:";
+
+  const forwardedProtocol = requestHeaders
+    .get("x-forwarded-proto")
+    ?.split(",", 1)[0]
+    .trim()
+    .toLowerCase();
+  if (forwardedProtocol === "http" || forwardedProtocol === "https") {
+    return forwardedProtocol === "https";
+  }
+
+  const siteProtocol = protocolFromUrl(process.env.NEXT_PUBLIC_SITE_URL ?? null);
+  if (siteProtocol) return siteProtocol === "https:";
+
+  return process.env.NODE_ENV === "production";
+}
+
 export function assertSessionConfigured() {
   getSessionKey();
+  configuredSecureCookieValue();
 }
 
 export async function createSession(userId: string) {
@@ -30,7 +75,7 @@ export async function createSession(userId: string) {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: await shouldUseSecureCookie(),
     sameSite: "lax",
     maxAge: SESSION_DURATION_SECONDS,
     path: "/",

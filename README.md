@@ -29,10 +29,14 @@ The login, signup, and dashboard routes require MongoDB and a session secret. Co
 MONGODB_URI=mongodb://127.0.0.1:27017/vdinfotech
 SESSION_SECRET=replace-with-a-random-secret-containing-at-least-32-characters
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+SESSION_COOKIE_SECURE=auto
 ```
 
 For production, use your hosted MongoDB connection string and generate a unique,
-high-entropy session secret. Never commit `.env.local`.
+high-entropy session secret. `SESSION_COOKIE_SECURE=auto` detects whether the
+login request uses HTTP or HTTPS; use HTTPS for production whenever possible.
+You can explicitly set it to `true` behind an HTTPS proxy if the original
+protocol headers are unavailable. Never commit `.env.local`.
 
 Blog images and downloadable files are stored in `storage/blog` by default. Set
 `BLOG_UPLOAD_DIR` to an absolute path on a persistent writable disk in production.
