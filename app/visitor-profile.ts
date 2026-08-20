@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
+import { createClientId } from "@/lib/client-id";
 
 const STORAGE_KEY = "vdinfotech.visitor";
 const PROFILE_EVENT = "vdinfotech:visitor-profile";
@@ -41,7 +42,7 @@ export function saveVisitorProfile(profile: Omit<VisitorProfile, "visitorId"> & 
   let current = emptyProfile;
   try { current = { ...emptyProfile, ...JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}") }; } catch { /* Ignore invalid legacy data. */ }
   const next: VisitorProfile = {
-    visitorId: profile.visitorId || current.visitorId || crypto.randomUUID(),
+    visitorId: profile.visitorId || current.visitorId || createClientId(),
     name: profile.name || current.name,
     email: profile.email || current.email,
     phone: profile.phone || current.phone,

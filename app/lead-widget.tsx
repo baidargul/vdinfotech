@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import { usePathname } from "next/navigation";
 import { createLeadAction, type LeadActionState } from "@/app/actions/leads";
 import type { ContactWidgetSettingsData } from "@/lib/contact-widget-settings";
+import { createClientId } from "@/lib/client-id";
 import { saveVisitorProfile, useVisitorProfile } from "./visitor-profile";
 
 function ChatIcon() {
@@ -27,7 +28,7 @@ export function LeadWidget({ settings }: { settings: ContactWidgetSettingsData }
     setPending(true);
     setState({});
     const data = new FormData(form);
-    const visitorId = profile.visitorId || crypto.randomUUID();
+    const visitorId = profile.visitorId || createClientId();
     data.set("visitorId", visitorId);
     data.set("source", "chat-widget");
     data.set("pageUrl", window.location.href);

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { createTemplateAction, updateTemplateAction, type TemplateActionState } from "@/app/actions/hero-templates";
+import { createClientId } from "@/lib/client-id";
 import { emptyHeroCta, heroAnimations, heroImageObjectPosition, heroLayouts, type HeroCta, type HeroLayout, type HeroSettingsData, type HeroSlide, type HeroTemplateActivity } from "@/lib/hero-types";
 
 const animationLabels: Record<string, string> = { fade: "Fade", "slide-left": "Slide from right", "slide-right": "Slide from left", "slide-up": "Slide upward", zoom: "Zoom", flip: "Soft flip" };
@@ -119,7 +120,7 @@ export function HeroEditorPreview({ settings, active, playing, setActive, setPla
 }
 
 function newSlide(): HeroSlide {
-  return { id: crypto.randomUUID(), layout: "split-right", eyebrow: "", title: "New slide title", accent: "", subtitle: "", description: "", imageId: "", imageUrl: "", imageAlt: "", imagePosition: "center", imageOffsetX: 0, imageOffsetY: 0, customAnimation: false, enterAnimation: "fade", exitAnimation: "fade", primaryCta: emptyHeroCta(), secondaryCta: emptyHeroCta() };
+  return { id: createClientId(), layout: "split-right", eyebrow: "", title: "New slide title", accent: "", subtitle: "", description: "", imageId: "", imageUrl: "", imageAlt: "", imagePosition: "center", imageOffsetX: 0, imageOffsetY: 0, customAnimation: false, enterAnimation: "fade", exitAnimation: "fade", primaryCta: emptyHeroCta(), secondaryCta: emptyHeroCta() };
 }
 
 type HeroEditorProps = { initialSettings: HeroSettingsData; template?: { id: string; revision: number; name: string; description: string; activity: HeroTemplateActivity[] } };

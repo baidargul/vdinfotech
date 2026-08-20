@@ -4,6 +4,7 @@ import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { createLeadAction, type LeadActionState } from "@/app/actions/leads";
+import { createClientId } from "@/lib/client-id";
 import { saveVisitorProfile, useVisitorProfile } from "./visitor-profile";
 
 function ArrowIcon() {
@@ -68,7 +69,7 @@ export function ContactForm() {
     setPending(true);
     setState({});
     const data = new FormData(form);
-    const visitorId = profile.visitorId || crypto.randomUUID();
+    const visitorId = profile.visitorId || createClientId();
     data.set("visitorId", visitorId);
     data.set("source", "contact-form");
     data.set("pageUrl", window.location.href);

@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useActionState, useRef, useState } from "react";
 import { saveReviewSettingsAction, type ReviewSettingsState } from "@/app/actions/settings";
+import { createClientId } from "@/lib/client-id";
 import type { ReviewItemData, ReviewSettingsData } from "@/lib/review-settings";
 
 const emptyReview = (): ReviewItemData => ({
-  id: crypto.randomUUID(),
+  id: createClientId(),
   name: "",
   role: "",
   quote: "",
